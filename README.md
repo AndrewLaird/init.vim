@@ -7,5 +7,5 @@ https://github.com/neovim/neovim/wiki/Installing-Neovim
 
 2. Get this configuration file by cloning the repo in `~/.config/nvim`:
   ```
-  git clone https://github.com/CLevasseur/init.vim.git ~/.config/nvim
+  git clone https://github.com/AndrewLaird/init.vim.git ~/.config/nvim
   ```
