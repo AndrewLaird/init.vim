@@ -2,7 +2,7 @@
 print('in here')
 require('telescope').setup {
     defaults ={
-        prompt_prefix = "ʕᵔ//ᴥ//ᵔʔ",
+        prompt_prefix = " >",
     },
     extensions = {
         fzy_native = {

@@ -80,7 +80,7 @@ nmap <leader>ee :Colors<CR>
 nmap <leader>s <C-w>s<C-w>j:terminal<CR>
 nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
 nmap <leader>d <Plug>(pydocstring)
-"nmap <leader>f :Files<CR>
+nmap <leader>f :Files<CR>
 nmap <leader>t :TagbarToggle<CR>
 
 " Telescope
@@ -88,7 +88,7 @@ nmap <leader>t :TagbarToggle<CR>
 
 " Find files using Telescope command-line sugar.
 " Customize telescope to use native fuzzy finder
-nnoremap <leader>f <cmd>Telescope find_files<cr>
+"nnoremap <leader>f <cmd>Telescope find_files<cr>
 nnoremap <leader>g <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
