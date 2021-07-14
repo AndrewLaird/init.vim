@@ -39,6 +39,13 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-fzy-native.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+" Treesitter
+Plug 'nvim-treesitter/nvim-treesitter'
+" Function signatures
+Plug 'ray-x/lsp_signature.nvim'
+" Completions
+Plug 'hrsh7th/nvim-compe'
 call plug#end()
 "
 " " vim-sensible does alot of the work
@@ -67,8 +74,11 @@ set number
 set title
 set undodir=~/.config/nvim/undo-dir
 set undofile
+set redrawtime=100000
 filetype off
 filetype plugin indent on
+" for completion
+set completeopt=menuone,noselect
 " allow the use of mouse, as a treat
 "set mouse=a
 "
@@ -80,7 +90,7 @@ nmap <leader>ee :Colors<CR>
 nmap <leader>s <C-w>s<C-w>j:terminal<CR>
 nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
 nmap <leader>d <Plug>(pydocstring)
-nmap <leader>f :Files<CR>
+"nmap <leader>f :Files<CR>
 nmap <leader>t :TagbarToggle<CR>
 
 " Telescope
@@ -89,9 +99,16 @@ nmap <leader>t :TagbarToggle<CR>
 " Find files using Telescope command-line sugar.
 " Customize telescope to use native fuzzy finder
 "nnoremap <leader>f <cmd>Telescope find_files<cr>
-nnoremap <leader>g <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+"nnoremap <leader>g <cmd>Telescope live_grep<cr>
+"nnoremap <leader>fb <cmd>Telescope buffers<cr>
+"nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>fi <cmd>lua require('telescope.builtin').find_files({cwd="~/.config/nvim/"})<cr>
+nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>fs <cmd>lua require('telescope.builtin').grep_string()<cr>
+nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
 " autocmd FileType python nmap <leader>x :0,$!python -m yapf<CR>
 " "autocmd FileType python nmap <leader>r :w<CR>:exec '!python3'
