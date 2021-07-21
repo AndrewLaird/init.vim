@@ -18,7 +18,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'sheerun/vim-polyglot'
 Plug 'chrisbra/Colorizer'
 Plug 'KabbAmine/vCoolor.vim'
-Plug 'heavenshell/vim-pydocstring', { 'do': 'make install' }
 Plug 'vim-scripts/loremipsum'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
@@ -42,10 +41,16 @@ Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 " Treesitter
 Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/playground'
+" LSP
+" requires npm install -g intelephense
+Plug 'neovim/nvim-lspconfig'
 " Function signatures
 Plug 'ray-x/lsp_signature.nvim'
 " Completions
 Plug 'hrsh7th/nvim-compe'
+" Better indent for php html
+Plug 'captbaritone/better-indent-support-for-php-with-html'
 call plug#end()
 "
 " " vim-sensible does alot of the work
@@ -78,7 +83,7 @@ set redrawtime=100000
 filetype off
 filetype plugin indent on
 " for completion
-set completeopt=menuone,noselect
+set completeopt=menuone
 " allow the use of mouse, as a treat
 "set mouse=a
 "
@@ -89,12 +94,18 @@ nmap <leader>q :NERDTreeToggle<CR>
 nmap <leader>ee :Colors<CR>
 nmap <leader>s <C-w>s<C-w>j:terminal<CR>
 nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
-nmap <leader>d <Plug>(pydocstring)
 "nmap <leader>f :Files<CR>
 nmap <leader>t :TagbarToggle<CR>
+" fold everything based on indent
+nmap <leader>fm :set foldmethod=indent<CR>
+" Dealing with quickfix list
+nmap <C-k> :cprev <CR>
+nmap <C-j> :cnext <CR>
+nmap <leader>o :copen<CR>
 
 " Telescope
 :lua require('luaModules')
+
 
 " Find files using Telescope command-line sugar.
 " Customize telescope to use native fuzzy finder
