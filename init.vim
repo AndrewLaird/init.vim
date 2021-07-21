@@ -39,13 +39,15 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-fzy-native.nvim'
-Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+"Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 " Treesitter
 Plug 'nvim-treesitter/nvim-treesitter'
 " Function signatures
 Plug 'ray-x/lsp_signature.nvim'
 " Completions
 Plug 'hrsh7th/nvim-compe'
+" Send to window
+Plug 'KKPMW/vim-sendtowindow'   
 call plug#end()
 "
 " " vim-sensible does alot of the work
@@ -78,7 +80,7 @@ set redrawtime=100000
 filetype off
 filetype plugin indent on
 " for completion
-set completeopt=menuone,noselect
+set completeopt=menuone
 " allow the use of mouse, as a treat
 "set mouse=a
 "
@@ -92,6 +94,10 @@ nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
 nmap <leader>d <Plug>(pydocstring)
 "nmap <leader>f :Files<CR>
 nmap <leader>t :TagbarToggle<CR>
+" open new python terminal
+nmap <leader>p :new term://bash<CR>ipython3<CR><C-\><C-n><C-w>j <C-w>H
+" send to window
+
 
 " Telescope
 :lua require('luaModules')
