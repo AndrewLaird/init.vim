@@ -39,7 +39,7 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-fzy-native.nvim'
 " Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 " Treesitter
-Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': 'TSUpdate'}
 Plug 'nvim-treesitter/playground'
 " LSP
 " requires npm install -g intelephense
@@ -50,6 +50,14 @@ Plug 'ray-x/lsp_signature.nvim'
 Plug 'hrsh7th/nvim-compe'
 " Better indent for php html
 Plug 'captbaritone/better-indent-support-for-php-with-html'
+" Primeagen refactoring
+" Plug 'ThePrimeagen/refactoring.nvim'
+" pluggin while I work on it
+Plug 'AndrewLaird/refactoring.nvim'
+
+
+" Document strings
+Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
 call plug#end()
 "
 " " vim-sensible does alot of the work
@@ -120,7 +128,10 @@ nnoremap <leader>fs <cmd>lua require('telescope.builtin').grep_string()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
-nnoremap <leader>gr <cmd>source ~/.config/nvim/init.vim<cr>
+nnoremap <leader>r <cmd>source ~/.config/nvim/init.vim<cr>
+
+"vnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
+"nnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
 
 " LSP config
 
@@ -198,3 +209,6 @@ for _, lsp in ipairs(servers) do
   }
 end
 EOF
+
+" Source journal bindings
+source ~/.config/nvim/journal.vim
