@@ -10,7 +10,20 @@ https://github.com/neovim/neovim/wiki/Installing-Neovim
   git clone https://github.com/AndrewLaird/init.vim.git ~/.config/nvim
   ```
 
-3. To get live_grep working in telescope, you'll need rip grep which can be installed with
+3. download neovim 0.5 > 
+	```
+	sudo add-apt-repository ppa:neovim-ppa/unstable
+	sudo apt-get update
+	sudo apt-get install neovim
+	```
+4.Install Plug
+  ```
+  curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  ```
+
+
+4. To get live_grep working in telescope, you'll need rip grep which can be installed with
   ```
   sudo add-apt-repository ppa:x4121/ripgrep
   sudo apt-get update

@@ -55,6 +55,9 @@ Plug 'captbaritone/better-indent-support-for-php-with-html'
 " pluggin while I work on it
 Plug 'AndrewLaird/refactoring.nvim'
 
+"plugins for datascience
+Plug 'KKPMW/vim-sendtowindow'        " send commands to REPL
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 
 " Document strings
 Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
@@ -105,8 +108,8 @@ nmap <leader>t :TagbarToggle<CR>
 " fold everything based on indent
 nmap <leader>fm :set foldmethod=indent<CR>
 " Dealing with quickfix list
-nmap <C-k> :cprev <CR>
-nmap <C-j> :cnext <CR>
+nmap <C-p> :cprev <CR>
+nmap <C-n> :cnext <CR>
 nmap <leader>o :copen<CR>
 
 " Telescope
@@ -210,5 +213,14 @@ for _, lsp in ipairs(servers) do
 end
 EOF
 
+" Make adjusing split sizes a bit more friendly
+noremap <silent> <C-Left> :vertical resize +3<CR>
+noremap <silent> <C-Right> :vertical resize -3<CR>
+noremap <silent> <C-Up> :resize -3<CR>
+noremap <silent> <C-Down> :resize +3<CR>
+
+
 " Source journal bindings
 source ~/.config/nvim/journal.vim
+" Source python bindings/plugins
+" source ~/.config/nvim/datascience.vim
