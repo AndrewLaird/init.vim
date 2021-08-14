@@ -58,8 +58,6 @@ Plug 'AndrewLaird/refactoring.nvim'
 "plugins for datascience
 Plug 'KKPMW/vim-sendtowindow'        " send commands to REPL
 
-" better vim start
-Plug 'mhinz/vim-startify'
 " Document strings
 Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
 call plug#end()
@@ -125,17 +123,20 @@ nmap <leader>o :copen<CR>
 "nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
 nnoremap <leader>fi <cmd>lua require('telescope.builtin').find_files({cwd="~/.config/nvim/"})<cr>
 nnoremap <leader>fl <cmd>lua require('telescope.builtin').lsp_references()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>fs <cmd>lua require('telescope.builtin').grep_string()<cr>
+nnoremap <leader>fc <cmd>lua require('telescope.builtin').grep_string({search=vim.fn.expand "%:t:r"})<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
 nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
-nnoremap <leader>r <cmd>source ~/.config/nvim/init.vim<cr>
+nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 
-"vnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
-"nnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
+vnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
+nnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
 
 " LSP config
 
@@ -165,6 +166,41 @@ augroup DetectIndent
 tnoremap <leader><ESC> <C-\><C-n>
 
 lua << EOF
+-- Setup refactoring
+local refactor = require("refactoring")
+refactor.setup()
+
+-- telescope refactoring helper
+local function refactor(prompt_bufnr)
+    local content = require("telescope.actions.state").get_selected_entry(
+        prompt_bufnr
+    )
+    require("telescope.actions").close(prompt_bufnr)
+    require("refactoring").refactor(content.value)
+end
+-- NOTE: M is a global object
+-- for the sake of simplicity in this example
+-- you can extract this function and the helper above
+-- and then require the file and call the extracted function
+-- in the mappings below
+M = {}
+M.refactors = function()
+    require("telescope.pickers").new({}, {
+        prompt_title = "refactors",
+        finder = require("telescope.finders").new_table({
+            results = require("refactoring").get_refactors(),
+        }),
+        sorter = require("telescope.config").values.generic_sorter({}),
+        attach_mappings = function(_, map)
+            map("i", "<CR>", refactor)
+            map("n", "<CR>", refactor)
+            return true
+        end
+    }):find()
+end
+
+
+
 local nvim_lsp = require('lspconfig')
 -- LSP
 require'lspconfig'.intelephense.setup{}
@@ -199,6 +235,10 @@ local on_attach = function(client, bufnr)
   --buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
   buf_set_keymap("n", "<space>gf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
 
+  vim.api.nvim_set_keymap("v", "<space>re", [[ <Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>rf", [[ <Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>rt", [[ <Cmd>lua M.refactors()<CR>]], {noremap = true, silent = true, expr = false})
+
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
@@ -223,5 +263,6 @@ noremap <silent> <C-Down> :resize +3<CR>
 
 " Source journal bindings
 source ~/.config/nvim/journal.vim
+source ~/.config/nvim/testing.vim
 " Source python bindings/plugins
 " source ~/.config/nvim/datascience.vim
