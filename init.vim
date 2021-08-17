@@ -106,7 +106,6 @@ set completeopt=menuone
 " " Custom Mappings
 let mapleader=" "
 "
-nmap <leader>ee :Colors<CR>
 nmap <leader>s <C-w>s<C-w>j:terminal<CR>
 nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
 "nmap <leader>f :Files<CR>
@@ -129,19 +128,34 @@ nmap <leader>o :copen<CR>
 "nnoremap <leader>fb <cmd>Telescope buffers<cr>
 "nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
+" Find files in current directory
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+" Find files you've opened recently
 nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
+" Find files in your nvim directory
 nnoremap <leader>fi <cmd>lua require('telescope.builtin').find_files({cwd="~/.config/nvim/"})<cr>
+" 
 nnoremap <leader>fl <cmd>lua require('telescope.builtin').lsp_references()<cr>
+" Live Grep, Fxg but you go straight there
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+" Grep the string under your cursor
 nnoremap <leader>fs <cmd>lua require('telescope.builtin').grep_string()<cr>
+" Find instance of your current filename, (great for moving up the tree if you're in a view)
 nnoremap <leader>fc <cmd>lua require('telescope.builtin').grep_string({search=vim.fn.expand "%:t:r"})<cr>
+" See your buffers, weirdest way to do tabs there is, it's the list of current
+" files you've opened in this session
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+" all the help for all the functions you have (wild)
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+" all your marks, great for traversing global marks because you can see where
+" you're going 
 nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
+" goto the references of what is under your cursor
 nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
+" reload init.vim
 nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 
+" Testing for refactoring, ignore
 vnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
 nnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
 
@@ -162,6 +176,7 @@ autocmd BufReadPost *
   \ |   exe "normal! g`\""
   \ | endif
 
+" If you're in javascript, auto run it with  <leader>r
 augroup DetectIndent
        autocmd!
           autocmd BufReadPost *  DetectIndent
@@ -172,6 +187,7 @@ augroup DetectIndent
 " terminal mode escape to return to normal mode
 tnoremap <leader><ESC> <C-\><C-n>
 
+" until EOF, this is in lua
 lua << EOF
 -- Setup refactoring
 local refactor = require("refactoring")
@@ -210,6 +226,7 @@ end
 
 local nvim_lsp = require('lspconfig')
 -- LSP
+-- Sets up php lsp
 require'lspconfig'.intelephense.setup{}
 
 -- Use an on_attach function to only map the following keys
@@ -225,26 +242,33 @@ local on_attach = function(client, bufnr)
   local opts = { noremap=true, silent=true }
 
   -- See `:help vim.lsp.*` for documentation on any of the below functions
+  -- go to where this was declared
   buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  -- go to where this was declared
   buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  -- hover over the item to get it signature
   buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  -- don't think these  are implemented for our php
   buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  --Formats the file
+  buf_set_keymap("n", "<space>gf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  -- More Refacotring stuff
+  vim.api.nvim_set_keymap("v", "<space>re", [[ <Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>rf", [[ <Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>rt", [[ <Cmd>lua M.refactors()<CR>]], {noremap = true, silent = true, expr = false})
+
   --buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   --buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   --buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   --buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   --buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   --buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  buf_set_keymap("n", "<space>gf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
 
-  vim.api.nvim_set_keymap("v", "<space>re", [[ <Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
-  vim.api.nvim_set_keymap("v", "<space>rf", [[ <Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
-  vim.api.nvim_set_keymap("v", "<space>rt", [[ <Cmd>lua M.refactors()<CR>]], {noremap = true, silent = true, expr = false})
 
 end
 
@@ -269,7 +293,9 @@ noremap <silent> <C-Down> :resize +3<CR>
 
 
 " Source journal bindings
+" Sets up the commands for journalilng
 source ~/.config/nvim/journal.vim
+" Sets up the commands for testing
 source ~/.config/nvim/testing.vim
 " Source python bindings/plugins
 " source ~/.config/nvim/datascience.vim
