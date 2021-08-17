@@ -1,26 +1,32 @@
 "this is our vimrc
 call plug#begin()
 
+" Color Scheme
 Plug 'morhetz/gruvbox'
 " Functionalities
+" Git inside vim, so like :Git diff and Git status (super nice)
 Plug 'tpope/vim-fugitive'
+" Just some defaults to make vim nice
 Plug 'tpope/vim-sensible'
+" Adds the surround command, used to change surounding characters
+" You can change "Hello" to 'Hello' or (Hello)
 Plug 'tpope/vim-surround'
+" (Best plugin), sets shiftwidth/tabwith to whatever the file is already, it's set and forget
 Plug 'tpope/vim-sleuth'
+" Similar
 Plug 'roryokane/detectindent'
+" Python client for LSP
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'deoplete-plugins/deoplete-jedi'
+" () {} ""
 Plug 'jiangmiao/auto-pairs'
+" <table></table> etc...
 Plug 'alvan/vim-closetag'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'sheerun/vim-polyglot'
-Plug 'chrisbra/Colorizer'
-Plug 'KabbAmine/vCoolor.vim'
-Plug 'vim-scripts/loremipsum'
+
+" creates snipits, I don't have it bound
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-Plug 'metakirby5/codi.vim'
+
 " " for comments in many languages
 Plug 'preservim/nerdcommenter'
 " Summary of the files functions
@@ -56,6 +62,7 @@ Plug 'captbaritone/better-indent-support-for-php-with-html'
 Plug 'AndrewLaird/refactoring.nvim'
 
 "plugins for datascience
+" lets you send python code to a terminal split
 Plug 'KKPMW/vim-sendtowindow'        " send commands to REPL
 
 " Document strings
