@@ -18,8 +18,8 @@ https://github.com/neovim/neovim/wiki/Installing-Neovim
 	```
 4.Install Plug
   ```
-  curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   ```
 
 
@@ -28,4 +28,8 @@ https://github.com/neovim/neovim/wiki/Installing-Neovim
   sudo add-apt-repository ppa:x4121/ripgrep
   sudo apt-get update
   sudo apt-get install ripgrep
+  ```
+6. To get Python LSP working, install python lsp
+  ```
+  pipx install 'python-lsp-server[all]'
   ```

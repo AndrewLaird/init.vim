@@ -24,8 +24,6 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'alvan/vim-closetag'
 
 " creates snipits, I don't have it bound
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
 
 " " for comments in many languages
 Plug 'preservim/nerdcommenter'
@@ -59,7 +57,7 @@ Plug 'captbaritone/better-indent-support-for-php-with-html'
 " Primeagen refactoring
 " Plug 'ThePrimeagen/refactoring.nvim'
 " pluggin while I work on it
-Plug 'AndrewLaird/refactoring.nvim'
+" Plug 'AndrewLaird/refactoring.nvim'
 
 "plugins for datascience
 " lets you send python code to a terminal split
@@ -156,8 +154,6 @@ nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
 nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 
 " Testing for refactoring, ignore
-vnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
-nnoremap <leader>tt <cmd>lua require('refactoring.106').extract()<cr>
 
 " LSP config
 
@@ -189,38 +185,6 @@ tnoremap <leader><ESC> <C-\><C-n>
 
 " until EOF, this is in lua
 lua << EOF
--- Setup refactoring
-local refactor = require("refactoring")
-refactor.setup()
-
--- telescope refactoring helper
-local function refactor(prompt_bufnr)
-    local content = require("telescope.actions.state").get_selected_entry(
-        prompt_bufnr
-    )
-    require("telescope.actions").close(prompt_bufnr)
-    require("refactoring").refactor(content.value)
-end
--- NOTE: M is a global object
--- for the sake of simplicity in this example
--- you can extract this function and the helper above
--- and then require the file and call the extracted function
--- in the mappings below
-M = {}
-M.refactors = function()
-    require("telescope.pickers").new({}, {
-        prompt_title = "refactors",
-        finder = require("telescope.finders").new_table({
-            results = require("refactoring").get_refactors(),
-        }),
-        sorter = require("telescope.config").values.generic_sorter({}),
-        attach_mappings = function(_, map)
-            map("i", "<CR>", refactor)
-            map("n", "<CR>", refactor)
-            return true
-        end
-    }):find()
-end
 
 
 
@@ -274,7 +238,7 @@ end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
-local servers = {'intelephense'}
+local servers = {'intelephense', 'pylsp'}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
