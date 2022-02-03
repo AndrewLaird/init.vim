@@ -91,7 +91,7 @@ set encoding=utf-8
 set relativenumber
 set number
 set title
-set undodir=~/.config/nvim/undo-dir
+set undodir=~\AppData\Local\nvim\undo-dir
 set undofile
 set redrawtime=100000
 filetype off
@@ -151,7 +151,7 @@ nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
 " goto the references of what is under your cursor
 nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
 " reload init.vim
-nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
+nnoremap <leader>rl <cmd>source ~\AppData\Local\nvim\init.vim<cr>
 
 " Testing for refactoring, ignore
 
@@ -258,8 +258,8 @@ noremap <silent> <C-Down> :resize +3<CR>
 
 " Source journal bindings
 " Sets up the commands for journalilng
-source ~/.config/nvim/journal.vim
+source ~\AppData\Local\nvim\journal.vim
 " Sets up the commands for testing
-source ~/.config/nvim/testing.vim
-" Source python bindings/plugins
-" source ~/.config/nvim/datascience.vim
+source ~\AppData\Local\nvim\testing.vim
+" Source python bindings\plugins
+" source ~\AppData\Local\nvim\datascience.vim
