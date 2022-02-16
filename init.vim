@@ -24,8 +24,8 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'alvan/vim-closetag'
 
 " creates snipits, I don't have it bound
-
-" " for comments in many languages
+Plug 'hrsh7th/vim-vsnip'
+" for comments in many languages
 Plug 'preservim/nerdcommenter'
 " Summary of the files functions
 Plug 'preservim/tagbar'
@@ -35,6 +35,10 @@ Plug 'ggreer/the_silver_searcher'
 Plug 'BurntSushi/ripgrep'
 " Status bar
 Plug 'vim-airline/vim-airline'
+
+" Get call tree
+ Plug 'ldelossa/litee.nvim'
+ Plug 'ldelossa/litee-calltree.nvim'
 
 " TeleScope
 Plug 'nvim-lua/popup.nvim'
@@ -51,7 +55,11 @@ Plug 'neovim/nvim-lspconfig'
 " Function signatures
 Plug 'ray-x/lsp_signature.nvim'
 " Completions
-Plug 'hrsh7th/nvim-compe'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
 " Better indent for php html
 Plug 'captbaritone/better-indent-support-for-php-with-html'
 " Primeagen refactoring
@@ -59,12 +67,25 @@ Plug 'captbaritone/better-indent-support-for-php-with-html'
 " pluggin while I work on it
 " Plug 'AndrewLaird/refactoring.nvim'
 
-"plugins for datascience
+" plugins for datascience
 " lets you send python code to a terminal split
 Plug 'KKPMW/vim-sendtowindow'        " send commands to REPL
 
 " Document strings
 Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
+" Line diff
+Plug 'AndrewRadev/linediff.vim'
+" very infrequently a tree is nice
+Plug 'preservim/nerdtree'
+
+" pluging with chrome or firefox to have this config in text areas
+Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
+
+" Vim slime for sending text to another window
+Plug 'jpalardy/vim-slime'
+
+Plug 'ruanyl/vim-gh-line'
+
 call plug#end()
 "
 " " vim-sensible does alot of the work
@@ -97,7 +118,7 @@ set redrawtime=100000
 filetype off
 filetype plugin indent on
 " for completion
-set completeopt=menuone
+set completeopt=menu,menuone,noselect
 " allow the use of mouse, as a treat
 "set mouse=a
 "
@@ -107,7 +128,7 @@ let mapleader=" "
 nmap <leader>s <C-w>s<C-w>j:terminal<CR>
 nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
 "nmap <leader>f :Files<CR>
-nmap <leader>t :TagbarToggle<CR>
+"nmap <leader>t :TagbarToggle<CR>
 " fold everything based on indent
 nmap <leader>fm :set foldmethod=indent<CR>
 " Dealing with quickfix list
@@ -152,6 +173,18 @@ nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
 nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
 " reload init.vim
 nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
+" reload zshrc 
+nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
+nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
+
+" Makes <shift>Y behave like <shift>D (grab until end of the line)
+nnoremap Y yg$ 
+
+" for making marks all uppercase
+" noremap <silent> <expr> ' "'".toupper(nr2char(getchar()))
+" noremap <silent> <expr> m "m".toupper(nr2char(getchar()))
+" sunmap '
+" sunmap m
 
 " Testing for refactoring, ignore
 
@@ -182,6 +215,68 @@ augroup DetectIndent
 
 " terminal mode escape to return to normal mode
 tnoremap <leader><ESC> <C-\><C-n>
+
+" nvim-cmp
+lua <<EOF
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      end,
+    },
+    mapping = {
+      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+      ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it. 
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+
+  -- Setup lspconfig.
+  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  local servers = {'pyright'}
+  for _, lsp in ipairs(servers) do
+      require('lspconfig')[lsp].setup {
+        capabilities = capabilities
+      }
+  end
+EOF
+
 
 " until EOF, this is in lua
 lua << EOF
@@ -228,17 +323,19 @@ local on_attach = function(client, bufnr)
   --buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  --buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  --buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  --buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  --buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
 
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
-local servers = {'intelephense', 'pylsp'}
+-- pyright is too good, the type checking shows problems in our type defenitions
+-- local servers = {'pylsp'}
+local servers = {'pyright'}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -249,17 +346,30 @@ for _, lsp in ipairs(servers) do
 end
 EOF
 
-" Make adjusing split sizes a bit more friendly
-noremap <silent> <C-Left> :vertical resize +3<CR>
-noremap <silent> <C-Right> :vertical resize -3<CR>
-noremap <silent> <C-Up> :resize -3<CR>
-noremap <silent> <C-Down> :resize +3<CR>
+" for firenvim
+"let fc = g:firenvim_config['localSettings']
+"let fc['https?://[^/]+\.co\.uk/'] = { 'takeover': 'never', 'priority': 1 }
+"
+
+" For vim slime
+let g:slime_target = "tmux"
+let g:slime_paste_file = "$HOME/.slime_paste"
+" or maybe...
+let g:slime_paste_file = tempname()
+" for third window first pane
+let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_pane": ":3.0"}
+" for current window second pane
+"let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_pane": ":.1"}
 
 
 " Source journal bindings
 " Sets up the commands for journalilng
 source ~/.config/nvim/journal.vim
+" Sets up commands for python scratch, to get the right formatting
+source ~/.config/nvim/python_scratch.vim
 " Sets up the commands for testing
-source ~/.config/nvim/testing.vim
+" source ~/.config/nvim/testing.vim
 " Source python bindings/plugins
-" source ~/.config/nvim/datascience.vim
+source ~/.config/nvim/datascience.vim
+source ~/.config/nvim/forethought.vim
+

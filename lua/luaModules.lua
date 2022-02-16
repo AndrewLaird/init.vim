@@ -13,4 +13,10 @@ require('telescope').setup {
     }
 }
 require('telescope').load_extension('fzy_native')
+ 
+ -- for calltree
 
+-- configure the litee.nvim library 
+require('litee.lib').setup({})
+-- configure litee-calltree.nvim
+require('litee.calltree').setup({})
