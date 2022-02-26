@@ -22,8 +22,8 @@ function Python_open_yesterday()
     echom scrapy_directory.filename
 endfunction
 
-nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="~/.python_scratch/"})<cr>
-nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({cwd="~/.python_scratch/"})<cr>
+nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="~/forethought/forethought-server/.scrapy/"})<cr>
+nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({cwd="~/forethought/forethought-server/.scrapy/"})<cr>
 nnoremap <leader>tt <cmd>call Python_open_today()<cr>
 nnoremap <leader>ty <cmd>call Python_open_yesterday()<cr>
 
