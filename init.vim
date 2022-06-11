@@ -63,7 +63,7 @@ Plug 'hrsh7th/nvim-cmp'
 " Better indent for php html
 Plug 'captbaritone/better-indent-support-for-php-with-html'
 " Primeagen refactoring
-" Plug 'ThePrimeagen/refactoring.nvim'
+Plug 'ThePrimeagen/refactoring.nvim'
 " pluggin while I work on it
 " Plug 'AndrewLaird/refactoring.nvim'
 
@@ -86,10 +86,16 @@ Plug 'jpalardy/vim-slime'
 
 Plug 'ruanyl/vim-gh-line'
 
+" Async linter, used for mypy , appears to be slow
+" Plug 'scrooloose/syntastic'
+" Plug 'neomake/neomake'
+
 call plug#end()
 "
 " " vim-sensible does alot of the work
 " " but here's the last 1%
+" Side by side git diff
+set diffopt=vertical
 "
 set scrolloff=7
 colorscheme gruvbox
@@ -220,6 +226,7 @@ tnoremap <leader><ESC> <C-\><C-n>
 lua <<EOF
   -- Setup nvim-cmp.
   local cmp = require'cmp'
+  vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
   cmp.setup({
     snippet = {
@@ -232,10 +239,20 @@ lua <<EOF
       end,
     },
     mapping = {
+      ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+      ["<Down>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+      ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+      ["<Up>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
       ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
       ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
       ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ["<c-y>"] = cmp.mapping(
+      cmp.mapping.confirm {
+        behavior = cmp.ConfirmBehavior.Insert,
+        select = true,
+      },
+      { "i", "c" }
+      ),
       ['<C-e>'] = cmp.mapping({
         i = cmp.mapping.abort(),
         c = cmp.mapping.close(),
@@ -278,7 +295,9 @@ lua <<EOF
 EOF
 
 
-" until EOF, this is in lua
+
+
+"" until EOF, this is in lua
 lua << EOF
 
 
@@ -314,11 +333,6 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   --Formats the file
   buf_set_keymap("n", "<space>gf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-  -- More Refacotring stuff
-  vim.api.nvim_set_keymap("v", "<space>re", [[ <Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
-  vim.api.nvim_set_keymap("v", "<space>rf", [[ <Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
-  vim.api.nvim_set_keymap("v", "<space>rt", [[ <Cmd>lua M.refactors()<CR>]], {noremap = true, silent = true, expr = false})
-
   --buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   --buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
@@ -328,6 +342,32 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
+  -- Remaps for the refactoring operations currently offered by the plugin
+  require('refactoring').setup({})
+  vim.api.nvim_set_keymap("v", "<space>re", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>rf", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>rv", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("v", "<space>ri", [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+
+
+  -- Extract block doesn't need visual mode
+  vim.api.nvim_set_keymap("n", "<leader>rb", [[ <Cmd>lua require('refactoring').refactor('Extract Block')<CR>]], {noremap = true, silent = true, expr = false})
+  vim.api.nvim_set_keymap("n", "<leader>rbf", [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]], {noremap = true, silent = true, expr = false})
+
+  -- Inline variable can also pick up the identifier currently under the cursor without visual mode
+  vim.api.nvim_set_keymap("n", "<leader>ri", [[ <Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+
+  -- load refactoring Telescope extension
+  require("telescope").load_extension("refactoring")
+
+  -- remap to open the Telescope refactoring menu in visual mode
+  vim.api.nvim_set_keymap(
+      "v",
+      "<leader>rr",
+      "<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
+      { noremap = true }
+  )
+
 
 end
 
@@ -335,7 +375,7 @@ end
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp'}
-local servers = {'pyright'}
+local servers = {'pyright', "tsserver"}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -361,6 +401,8 @@ let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_
 " for current window second pane
 "let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_pane": ":.1"}
 
+" using mypy as syntax checker
+" let g:syntastic_python_checkers=['mypy']
 
 " Source journal bindings
 " Sets up the commands for journalilng
