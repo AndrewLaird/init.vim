@@ -29,6 +29,9 @@ Plug 'hrsh7th/vim-vsnip'
 Plug 'preservim/nerdcommenter'
 " Summary of the files functions
 Plug 'preservim/tagbar'
+" Look at class function or structure
+Plug 'liuchengxu/vista.vim'
+"
 " Used for Ag in vim fugitiveo
 Plug 'ggreer/the_silver_searcher'
 "Used for Rg in vim fugitive
@@ -182,6 +185,7 @@ nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 " reload zshrc 
 nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
+nnoremap <leader>bb <cmd>!black %<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
@@ -374,7 +378,7 @@ end
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
--- local servers = {'pylsp'}
+-- local servers = {'pylsp', "tsserver"}
 local servers = {'pyright', "tsserver"}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {

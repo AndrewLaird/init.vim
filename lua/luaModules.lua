@@ -20,3 +20,11 @@ require('telescope').load_extension('fzy_native')
 require('litee.lib').setup({})
 -- configure litee-calltree.nvim
 require('litee.calltree').setup({})
+
+local M = {}
+
+function M.hello_world()
+    print("in here");
+end
+
+return M
