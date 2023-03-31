@@ -21,10 +21,22 @@ require('litee.lib').setup({})
 -- configure litee-calltree.nvim
 require('litee.calltree').setup({})
 
+
 local M = {}
 
 function M.hello_world()
     print("in here");
+end
+--
+-- toggle_copilot.lua
+function M.ToggleCopilot()
+    if (vim.g.copilot_enabled == 1) then
+        print("disabling")
+        vim.cmd(":Copilot disable")
+    else
+        print("enabling")
+        vim.cmd(":Copilot enable")
+    end
 end
 
 return M

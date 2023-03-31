@@ -52,6 +52,8 @@ Plug 'nvim-telescope/telescope-fzy-native.nvim'
 " Treesitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': 'TSUpdate'}
 Plug 'nvim-treesitter/playground'
+" Keep functions and for loops on screen
+Plug 'nvim-treesitter/nvim-treesitter-context'
 " LSP
 " requires npm install -g intelephense
 Plug 'neovim/nvim-lspconfig'
@@ -88,6 +90,17 @@ Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
 Plug 'jpalardy/vim-slime'
 
 Plug 'ruanyl/vim-gh-line'
+
+
+" Docker tools
+Plug 'ekalinin/Dockerfile.vim'
+
+" Rust tools
+"
+" Codeum code compleition
+" Plug 'Exafunction/codeium.vim'
+" Code completion :Copilot setup
+Plug 'github/copilot.vim'
 
 " Async linter, used for mypy , appears to be slow
 " Plug 'scrooloose/syntastic'
@@ -148,6 +161,10 @@ nmap <leader>o :copen<CR>
 " Telescope
 :lua require('luaModules')
 
+nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
+
+
+
 
 " Find files using Telescope command-line sugar.
 " Customize telescope to use native fuzzy finder
@@ -175,6 +192,8 @@ nnoremap <leader>fc <cmd>lua require('telescope.builtin').grep_string({search=vi
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 " all the help for all the functions you have (wild)
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+" all the help for all the commands you have (wild)
+nnoremap <leader>fa <cmd>lua require('telescope.builtin').commands()<cr>
 " all your marks, great for traversing global marks because you can see where
 " you're going 
 nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
@@ -185,10 +204,20 @@ nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 " reload zshrc 
 nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
-nnoremap <leader>bb <cmd>!black %<cr>
+nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
+
+" Toggle copilot on and off
+" Copilot off by default
+let g:copilot_enabled = v:false
+" Copilot get next suggestion
+imap <C-n> <Plug>(copilot-next)
+imap <C-p> <Plug>(copilot-previous)
+" Copilot request a suggestion
+imap <C-y> <Plug>(copilot-suggest)
+
 
 " for making marks all uppercase
 " noremap <silent> <expr> ' "'".toupper(nr2char(getchar()))
@@ -228,6 +257,32 @@ tnoremap <leader><ESC> <C-\><C-n>
 
 " nvim-cmp
 lua <<EOF
+
+
+  -- setup nvim-treesitter-context
+  require'nvim-treesitter.configs'.setup {
+      -- A list of parser names, or "all"
+      ensure_installed = {"php","python","c","rust"},
+
+      -- Install parsers synchronously (only applied to `ensure_installed`)
+      sync_install = false,
+
+      -- Automatically install missing parsers when entering buffer
+      -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+      auto_install = true,
+
+      highlight = {
+        -- `false` will disable the whole extension
+        enable = true,
+
+        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+        -- Using this option may slow down your editor, and you may see some duplicate highlights.
+        -- Instead of true it can also be a list of languages
+        additional_vim_regex_highlighting = false,
+      },
+    }
+
   -- Setup nvim-cmp.
   local cmp = require'cmp'
   vim.opt.completeopt = { "menu", "menuone", "noselect" }
@@ -288,7 +343,7 @@ lua <<EOF
   -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
 
   -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   local servers = {'pyright'}
   for _, lsp in ipairs(servers) do
@@ -296,6 +351,7 @@ lua <<EOF
         capabilities = capabilities
       }
   end
+
 EOF
 
 
@@ -308,9 +364,6 @@ lua << EOF
 
 local nvim_lsp = require('lspconfig')
 -- LSP
--- Sets up php lsp
-require'lspconfig'.intelephense.setup{}
-
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
@@ -337,7 +390,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   --Formats the file
   buf_set_keymap("n", "<space>gf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-  --buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   --buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
   --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
@@ -379,7 +432,7 @@ end
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp', "tsserver"}
-local servers = {'pyright', "tsserver"}
+local servers = {'pyright', "tsserver", "intelephense"}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -388,34 +441,49 @@ for _, lsp in ipairs(servers) do
     }
   }
 end
+
+require'lspconfig'.rust_analyzer.setup{ on_attach=on_attach }
+
+
+
+
 EOF
 
-" for firenvim
-"let fc = g:firenvim_config['localSettings']
-"let fc['https?://[^/]+\.co\.uk/'] = { 'takeover': 'never', 'priority': 1 }
-"
 
-" For vim slime
+" Codeium bindings"
+"let g:codeium_manual = v:true"
+"imap <script><silent><nowait><expr> <C-s> codeium#Complete()"
+"imap <script><silent><nowait><expr> <C-g> codeium#Accept()
+" imap <C-;>   <Cmd>call codeium#CycleCompletions(1)<CR>
+" imap <C-,>   <Cmd>call codeium#CycleCompletions(-1)<CR>
+" imap <C-x>   <Cmd>call codeium#Clear()<CR>
+" Add to status line"
+" set statusline+=\{…\}%3{codeium#GetStatusString()}"
+
+" for firenvim"
+"let fc = g:firenvim_config['localSettings']"
+"let fc['https?://[^/]+\.co\.uk/'] = { 'takeover': 'never', 'priority': 1 }"
+
+" For vim slime"
 let g:slime_target = "tmux"
 let g:slime_paste_file = "$HOME/.slime_paste"
-" or maybe...
+" or maybe..."
 let g:slime_paste_file = tempname()
-" for third window first pane
+" for third window first pane"
 let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_pane": ":3.0"}
-" for current window second pane
-"let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_pane": ":.1"}
+" for current window second pane"
+"let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_pane": ":.1"}"
 
-" using mypy as syntax checker
-" let g:syntastic_python_checkers=['mypy']
+" using mypy as syntax checker"
+" let g:syntastic_python_checkers=['mypy']"
 
-" Source journal bindings
-" Sets up the commands for journalilng
+" Source journal bindings"
+" Sets up the commands for journalilng"
 source ~/.config/nvim/journal.vim
-" Sets up commands for python scratch, to get the right formatting
+" Sets up commands for python scratch, to get the right formatting"
 source ~/.config/nvim/python_scratch.vim
-" Sets up the commands for testing
-" source ~/.config/nvim/testing.vim
-" Source python bindings/plugins
+" Sets up the commands for testing"
+" source ~/.config/nvim/testing.vim"
+" Source python bindings/plugins"
 source ~/.config/nvim/datascience.vim
 source ~/.config/nvim/forethought.vim
-
