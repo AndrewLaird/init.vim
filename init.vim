@@ -432,7 +432,7 @@ end
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp', "tsserver"}
-local servers = {'pyright', "tsserver", "intelephense"}
+local servers = {'pyright', "tsserver", "intelephense", 'rust_analyzer'}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -441,9 +441,6 @@ for _, lsp in ipairs(servers) do
     }
   }
 end
-
-require'lspconfig'.rust_analyzer.setup{ on_attach=on_attach }
-
 
 
 
