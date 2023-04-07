@@ -175,6 +175,8 @@ nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
 " Find files in current directory
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+" Find files in current directory
+nnoremap <leader>fhf <cmd>lua require('telescope.builtin').find_files({hidden=true})<cr>
 " Find files you've opened recently
 nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
 " Find files in your nvim directory
@@ -191,9 +193,7 @@ nnoremap <leader>fc <cmd>lua require('telescope.builtin').grep_string({search=vi
 " files you've opened in this session
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 " all the help for all the functions you have (wild)
-nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
-" all the help for all the commands you have (wild)
-nnoremap <leader>fa <cmd>lua require('telescope.builtin').commands()<cr>
+nnoremap <leader>fa <cmd>lua require('telescope.builtin').help_tags()<cr>
 " all your marks, great for traversing global marks because you can see where
 " you're going 
 nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
@@ -203,8 +203,11 @@ nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
 nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 " reload zshrc 
 nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
+" include hidden
+nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({cwd="~",hidden=true})<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
-nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
+" nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
+ nnoremap <leader>bb <cmd>!php-cs-fixer fix %<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
@@ -468,9 +471,14 @@ let g:slime_default_config = {"socket_name": get(split($TMUX, ","), 0), "target_
 " Sets up the commands for journalilng"
 source ~/.config/nvim/journal.vim
 " Sets up commands for python scratch, to get the right formatting"
-source ~/.config/nvim/python_scratch.vim
+"source ~/.config/nvim/python_scratch.vim
+source ~/.config/nvim/php_scratch.vim
 " Sets up the commands for testing"
 " source ~/.config/nvim/testing.vim"
 " Source python bindings/plugins"
 source ~/.config/nvim/datascience.vim
 source ~/.config/nvim/forethought.vim
+
+" Don't fix the lack of newline at the end of a file 
+" prevents me from changing every file I visit
+set nofixendofline
