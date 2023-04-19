@@ -160,6 +160,12 @@ nmap <leader>o :copen<CR>
 
 " Telescope
 :lua require('luaModules')
+:lua require('function_between_lines')
+
+function! FunctionsBetweenLines(start_line, end_line)
+    return luaeval('functions_between_lines(_A[1], _A[2])', [a:start_line, a:end_line])
+endfunction
+command! -nargs=2 FunctionsBetweenLines echo FunctionsBetweenLines(<f-args>)
 
 " nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
