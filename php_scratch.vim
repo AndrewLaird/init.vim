@@ -31,8 +31,8 @@ function Python_open_yesterday()
     call Open_page_with_autoimport(filename)
 endfunction
 
-nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="~/forethought/forethought-server/.scrapy/"})<cr>
-nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({cwd="~/forethought/forethought-server/.scrapy/"})<cr>
+nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/", no_ignore=true})<cr>
+nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({cwd="/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/", no_ignore=true})<cr>
 nnoremap <leader>tt <cmd>call Python_open_today()<cr>
 nnoremap <leader>t1 <cmd>call Python_open_today_page(1)<cr>
 nnoremap <leader>t2 <cmd>call Python_open_today_page(2)<cr>

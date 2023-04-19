@@ -100,7 +100,7 @@ Plug 'ekalinin/Dockerfile.vim'
 " Codeum code compleition
 " Plug 'Exafunction/codeium.vim'
 " Code completion :Copilot setup
-Plug 'github/copilot.vim'
+" Plug 'github/copilot.vim'
 
 " Async linter, used for mypy , appears to be slow
 " Plug 'scrooloose/syntastic'
@@ -147,7 +147,7 @@ set completeopt=menu,menuone,noselect
 " " Custom Mappings
 let mapleader=" "
 "
-nmap <leader>s <C-w>s<C-w>j:terminal<CR>
+"nmap <leader>s <C-w>s<C-w>j:terminal<CR>
 nmap <leader>vs <C-w>v<C-w>l:terminal<CR>
 "nmap <leader>f :Files<CR>
 "nmap <leader>t :TagbarToggle<CR>
@@ -161,7 +161,7 @@ nmap <leader>o :copen<CR>
 " Telescope
 :lua require('luaModules')
 
-nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
+" nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
 
 
@@ -176,7 +176,7 @@ nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 " Find files in current directory
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 " Find files in current directory
-nnoremap <leader>fhf <cmd>lua require('telescope.builtin').find_files({hidden=true})<cr>
+nnoremap <leader>fhf <cmd>lua require('telescope.builtin').find_files({hidden=true, no_ignore=true})<cr>
 " Find files you've opened recently
 nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
 " Find files in your nvim directory
@@ -208,18 +208,20 @@ nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({cwd="~",h
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
 " nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
  nnoremap <leader>bb <cmd>!php-cs-fixer fix %<cr>
+" run current php file
+ nnoremap <leader>pp <cmd>!php %<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
 
 " Toggle copilot on and off
 " Copilot off by default
-let g:copilot_enabled = v:false
+" let g:copilot_enabled = v:false
 " Copilot get next suggestion
-imap <C-n> <Plug>(copilot-next)
-imap <C-p> <Plug>(copilot-previous)
+" imap <C-n> <Plug>(copilot-next)
+" imap <C-p> <Plug>(copilot-previous)
 " Copilot request a suggestion
-imap <C-y> <Plug>(copilot-suggest)
+" imap <C-y> <Plug>(copilot-suggest)
 
 
 " for making marks all uppercase
@@ -478,7 +480,12 @@ source ~/.config/nvim/php_scratch.vim
 " Source python bindings/plugins"
 source ~/.config/nvim/datascience.vim
 source ~/.config/nvim/forethought.vim
+source ~/.config/nvim/leasecalcs.vim
 
 " Don't fix the lack of newline at the end of a file 
 " prevents me from changing every file I visit
 set nofixendofline
+
+set tabstop=4
+set shiftwidth=4
+set expandtab
