@@ -100,11 +100,14 @@ Plug 'ekalinin/Dockerfile.vim'
 " Codeum code compleition
 " Plug 'Exafunction/codeium.vim'
 " Code completion :Copilot setup
-" Plug 'github/copilot.vim'
+Plug 'github/copilot.vim'
 
 " Async linter, used for mypy , appears to be slow
 " Plug 'scrooloose/syntastic'
 " Plug 'neomake/neomake'
+
+" Using llms locally in neovim
+Plug 'David-Kunz/gen.nvim'
 
 call plug#end()
 "
@@ -160,12 +163,8 @@ nmap <leader>o :copen<CR>
 
 " Telescope
 :lua require('luaModules')
-:lua require('function_between_lines')
-
-function! FunctionsBetweenLines(start_line, end_line)
-    return luaeval('functions_between_lines(_A[1], _A[2])', [a:start_line, a:end_line])
-endfunction
-command! -nargs=2 FunctionsBetweenLines echo FunctionsBetweenLines(<f-args>)
+:lua require('find_under')
+command! -nargs=1 SearchPattern call lua require('find_under').search_pattern(<q-args>)
 
 " nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
@@ -187,6 +186,8 @@ nnoremap <leader>fhf <cmd>lua require('telescope.builtin').find_files({hidden=tr
 nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
 " Find files in your nvim directory
 nnoremap <leader>fi <cmd>lua require('telescope.builtin').find_files({cwd="~/.config/nvim/"})<cr>
+" Grep files in your nvim directory
+nnoremap <leader>gi <cmd>lua require('telescope.builtin').live_grep({cwd="~/.config/nvim/"})<cr>
 " 
 nnoremap <leader>fl <cmd>lua require('telescope.builtin').lsp_references()<cr>
 " Live Grep, Fxg but you go straight there
@@ -216,13 +217,15 @@ nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
  nnoremap <leader>bb <cmd>!php-cs-fixer fix %<cr>
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
+ nnoremap <leader>rr <cmd>!cargo run<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
 
 " Toggle copilot on and off
+nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 " Copilot off by default
-" let g:copilot_enabled = v:false
+let g:copilot_enabled = v:false
 " Copilot get next suggestion
 " imap <C-n> <Plug>(copilot-next)
 " imap <C-p> <Plug>(copilot-previous)
@@ -273,7 +276,7 @@ lua <<EOF
   -- setup nvim-treesitter-context
   require'nvim-treesitter.configs'.setup {
       -- A list of parser names, or "all"
-      ensure_installed = {"php","python","c","rust"},
+      ensure_installed = {"php","python","c","rust", "typescript"},
 
       -- Install parsers synchronously (only applied to `ensure_installed`)
       sync_install = false,
@@ -352,6 +355,11 @@ lua <<EOF
   -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
 
   -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+
+  -- configure the litee.nvim library 
+  require('litee.lib').setup({})
+  -- configure litee-calltree.nvim
+  require('litee.calltree').setup({})
 
 EOF
 
