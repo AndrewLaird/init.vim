@@ -100,11 +100,14 @@ Plug 'ekalinin/Dockerfile.vim'
 " Codeum code compleition
 " Plug 'Exafunction/codeium.vim'
 " Code completion :Copilot setup
-" Plug 'github/copilot.vim'
+Plug 'github/copilot.vim'
 
 " Async linter, used for mypy , appears to be slow
 " Plug 'scrooloose/syntastic'
 " Plug 'neomake/neomake'
+"
+" grep and replace
+Plug 'nvim-pack/nvim-spectre'
 
 call plug#end()
 "
@@ -161,9 +164,7 @@ nmap <leader>o :copen<CR>
 " Telescope
 :lua require('luaModules')
 
-" nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
-
-
+nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
 
 " Find files using Telescope command-line sugar.
@@ -181,6 +182,8 @@ nnoremap <leader>fhf <cmd>lua require('telescope.builtin').find_files({hidden=tr
 nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
 " Find files in your nvim directory
 nnoremap <leader>fi <cmd>lua require('telescope.builtin').find_files({cwd="~/.config/nvim/"})<cr>
+" Grep files in your nvim directory
+nnoremap <leader>gi <cmd>lua require('telescope.builtin').live_grep({cwd="~/.config/nvim/"})<cr>
 " 
 nnoremap <leader>fl <cmd>lua require('telescope.builtin').lsp_references()<cr>
 " Live Grep, Fxg but you go straight there
@@ -207,12 +210,16 @@ nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
 nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({cwd="~",hidden=true})<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
 " nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
- nnoremap <leader>bb <cmd>!php-cs-fixer fix %<cr>
+ nnoremap <leader>bb <cmd>!php-cs-fixer fix % --using-cache=no<cr>
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
+" run current php file
+ nnoremap <leader>ts <cmd>set ts=4<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
+
+nnoremap <leader>S <cmd>lua require("spectre").open()<CR>
 
 " Toggle copilot on and off
 " Copilot off by default
@@ -250,15 +257,17 @@ autocmd BufReadPost *
   \ | endif
 
 " If you're in javascript, auto run it with  <leader>r
-augroup DetectIndent
-       autocmd!
-          autocmd BufReadPost *  DetectIndent
-      augroup END
+"augroup DetectIndent
+       "autocmd!
+          "autocmd BufReadPost *  DetectIndent
+      "augroup END
 
-      autocmd FileType javascript map <buffer> <leader>r :w<CR>:exec '!node' shellescape(@%, 1)<CR>
+      "autocmd FileType javascript map <buffer> <leader>r :w<CR>:exec '!node' shellescape(@%, 1)<CR>
 
 " terminal mode escape to return to normal mode
 tnoremap <leader><ESC> <C-\><C-n>
+
+
 
 " nvim-cmp
 lua <<EOF
@@ -427,7 +436,7 @@ end
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp', "tsserver"}
-local servers = {'pyright', "tsserver", "intelephense", 'rust_analyzer'}
+local servers = {'pyright', "intelephense", 'rust_analyzer'}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
