@@ -105,6 +105,9 @@ Plug 'github/copilot.vim'
 " Async linter, used for mypy , appears to be slow
 " Plug 'scrooloose/syntastic'
 " Plug 'neomake/neomake'
+"
+" grep and replace
+Plug 'nvim-pack/nvim-spectre'
 
 " Using llms locally in neovim
 Plug 'David-Kunz/gen.nvim'
@@ -165,9 +168,7 @@ nmap <leader>o :copen<CR>
 :lua require('find_under')
 command! -nargs=1 SearchPattern call lua require('find_under').search_pattern(<q-args>)
 
-" nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
-
-
+nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
 
 " Find files using Telescope command-line sugar.
@@ -213,14 +214,18 @@ nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
 nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({cwd="~",hidden=true})<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
 " nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
- nnoremap <leader>bb <cmd>!php-cs-fixer fix %<cr>
+ nnoremap <leader>bb <cmd>!php-cs-fixer fix % --using-cache=no<cr>
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
  nnoremap <leader>py <cmd>!python3 %<cr>
  nnoremap <leader>rr <cmd>!cargo run<cr>
+" run current php file
+ nnoremap <leader>ts <cmd>set ts=4<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
 nnoremap Y yg$ 
+
+nnoremap <leader>S <cmd>lua require("spectre").open()<CR>
 
 " Toggle copilot on and off
 nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
@@ -259,15 +264,17 @@ autocmd BufReadPost *
   \ | endif
 
 " If you're in javascript, auto run it with  <leader>r
-augroup DetectIndent
-       autocmd!
-          autocmd BufReadPost *  DetectIndent
-      augroup END
+"augroup DetectIndent
+       "autocmd!
+          "autocmd BufReadPost *  DetectIndent
+      "augroup END
 
-      autocmd FileType javascript map <buffer> <leader>r :w<CR>:exec '!node' shellescape(@%, 1)<CR>
+      "autocmd FileType javascript map <buffer> <leader>r :w<CR>:exec '!node' shellescape(@%, 1)<CR>
 
 " terminal mode escape to return to normal mode
 tnoremap <leader><ESC> <C-\><C-n>
+
+
 
 " nvim-cmp
 lua <<EOF
@@ -441,7 +448,7 @@ end
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp', "tsserver"}
-local servers = {'pyright', "tsserver", "intelephense", 'rust_analyzer'}
+local servers = {'pyright', "intelephense", 'rust_analyzer'}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,

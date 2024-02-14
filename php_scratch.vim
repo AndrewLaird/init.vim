@@ -40,4 +40,3 @@ nnoremap <leader>t3 <cmd>call Python_open_today_page(3)<cr>
 nnoremap <leader>t4 <cmd>call Python_open_today_page(4)<cr>
 nnoremap <leader>t5 <cmd>call Python_open_today_page(5)<cr>
 nnoremap <leader>ty <cmd>call Python_open_yesterday()<cr>
-

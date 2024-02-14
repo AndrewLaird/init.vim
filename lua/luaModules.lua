@@ -28,6 +28,9 @@ function M.hello_world()
     print("in here");
 end
 --
+-- Disable Copilot by default
+vim.g.copilot_enabled = false;
+
 -- toggle_copilot.lua
 function M.ToggleCopilot()
     if (vim.g.copilot_enabled == 1) then

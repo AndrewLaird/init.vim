@@ -25,4 +25,4 @@ endfunction
 
 " Map the function to a key combination, for example, <Leader>cs
 nnoremap <Leader>ss :call CamelToSnake()<CR>
-nnoremap <Leader>sw :call SnakeCaseUnderCursor()<CR>
+nnoremap <Leader>sc :call SnakeCaseUnderCursor()<CR>

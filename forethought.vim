@@ -17,5 +17,5 @@ endfunction
 
 
 nnoremap <leader>yn :call Yank_Current_Filename()<cr>
-nnoremap <leader>yc <cmd>let @* = expand("%")<cr>
+nnoremap <leader>yc <cmd>let @+ = expand("%")<cr>
 
