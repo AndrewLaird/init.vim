@@ -108,7 +108,6 @@ Plug 'github/copilot.vim'
 
 " Using llms locally in neovim
 Plug 'David-Kunz/gen.nvim'
-
 call plug#end()
 "
 " " vim-sensible does alot of the work
@@ -217,6 +216,7 @@ nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
  nnoremap <leader>bb <cmd>!php-cs-fixer fix %<cr>
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
+ nnoremap <leader>py <cmd>!python3 %<cr>
  nnoremap <leader>rr <cmd>!cargo run<cr>
 
 " Makes <shift>Y behave like <shift>D (grab until end of the line)
