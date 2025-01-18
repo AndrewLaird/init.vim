@@ -112,6 +112,8 @@ Plug 'sindrets/diffview.nvim'
 Plug 'akinsho/git-conflict.nvim'
 
 
+" Using llms locally in neovim
+Plug 'David-Kunz/gen.nvim'
 call plug#end()
 
 "
@@ -167,11 +169,8 @@ nmap <leader>o :copen<CR>
 
 " Telescope
 :lua require('luaModules')
-:lua require('function_between_lines')
-
-function! FunctionsBetweenLines(start_line, end_line)
-    return luaeval('functions_between_lines(_A[1], _A[2])', [a:start_line, a:end_line])
-endfunction
+:lua require('find_under')
+command! -nargs=1 SearchPattern call lua require('find_under').search_pattern(<q-args>)
 
 nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
@@ -227,6 +226,8 @@ nnoremap <leader>bp <cmd>!npx prettier % --write<cr>
 " remove file from linter_exclusion files
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
+ nnoremap <leader>py <cmd>!python3 %<cr>
+ nnoremap <leader>rr <cmd>!cargo run<cr>
 " run current php file
  nnoremap <leader>ts <cmd>set ts=4<cr>
 
@@ -249,8 +250,9 @@ endfunction
 nnoremap <leader>fq :call GitDiffToQuickfix()<CR>
 
 " Toggle copilot on and off
+nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 " Copilot off by default
-" let g:copilot_enabled = v:false
+let g:copilot_enabled = v:false
 " Copilot get next suggestion
 " imap <C-n> <Plug>(copilot-next)
 " imap <C-p> <Plug>(copilot-previous)
@@ -303,7 +305,7 @@ lua <<EOF
   -- setup nvim-treesitter-context
   require'nvim-treesitter.configs'.setup {
       -- A list of parser names, or "all"
-      ensure_installed = {"php","python","c","rust", 'javascript'},
+      ensure_installed = {"php","python","c","rust", "typescript", "javascript"},
 
       -- Install parsers synchronously (only applied to `ensure_installed`)
       sync_install = false,
@@ -382,6 +384,11 @@ lua <<EOF
   -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
 
   -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+
+  -- configure the litee.nvim library 
+  require('litee.lib').setup({})
+  -- configure litee-calltree.nvim
+  require('litee.calltree').setup({})
 
 EOF
 
