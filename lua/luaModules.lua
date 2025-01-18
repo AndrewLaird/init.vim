@@ -42,4 +42,25 @@ function M.ToggleCopilot()
     end
 end
 
+
+-- Grep over quickfixlist
+function M.GrepQuickfixFiles()
+  local quickfix_list = vim.fn.getqflist()
+  local files = {}
+  
+  -- Extract unique file paths from the quickfix list
+  for _, item in ipairs(quickfix_list) do
+    if item.bufnr > 0 then
+      local file_path = vim.fn.bufname(item.bufnr)
+      if file_path ~= "" and not vim.tbl_contains(files, file_path) then
+        table.insert(files, file_path)
+      end
+    end
+  end
+
+  -- Run live_grep with the file paths as the search directories
+  require('telescope.builtin').live_grep({ search_dirs = files })
+end
+
+
 return M

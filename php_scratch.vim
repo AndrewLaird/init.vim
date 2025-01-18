@@ -32,11 +32,15 @@ function Python_open_yesterday()
 endfunction
 
 nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/", no_ignore=true})<cr>
-nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({cwd="/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/", no_ignore=true})<cr>
+nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({search_dirs={"/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/"}, additional_args = function(opts) return {"--hidden", "--no-ignore"} end })<cr>
 nnoremap <leader>tt <cmd>call Python_open_today()<cr>
 nnoremap <leader>t1 <cmd>call Python_open_today_page(1)<cr>
 nnoremap <leader>t2 <cmd>call Python_open_today_page(2)<cr>
 nnoremap <leader>t3 <cmd>call Python_open_today_page(3)<cr>
 nnoremap <leader>t4 <cmd>call Python_open_today_page(4)<cr>
 nnoremap <leader>t5 <cmd>call Python_open_today_page(5)<cr>
+nnoremap <leader>t6 <cmd>call Python_open_today_page(6)<cr>
+nnoremap <leader>t7 <cmd>call Python_open_today_page(7)<cr>
+nnoremap <leader>t8 <cmd>call Python_open_today_page(8)<cr>
+nnoremap <leader>t9 <cmd>call Python_open_today_page(9)<cr>
 nnoremap <leader>ty <cmd>call Python_open_yesterday()<cr>

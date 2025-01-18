@@ -12,7 +12,7 @@ Plug 'tpope/vim-sensible'
 " You can change "Hello" to 'Hello' or (Hello)
 Plug 'tpope/vim-surround'
 " (Best plugin), sets shiftwidth/tabwith to whatever the file is already, it's set and forget
-Plug 'tpope/vim-sleuth'
+" Plug 'tpope/vim-sleuth'
 " Similar
 Plug 'roryokane/detectindent'
 " Python client for LSP
@@ -71,7 +71,6 @@ Plug 'captbaritone/better-indent-support-for-php-with-html'
 Plug 'ThePrimeagen/refactoring.nvim'
 " pluggin while I work on it
 " Plug 'AndrewLaird/refactoring.nvim'
-
 " plugins for datascience
 " lets you send python code to a terminal split
 Plug 'KKPMW/vim-sendtowindow'        " send commands to REPL
@@ -108,8 +107,13 @@ Plug 'github/copilot.vim'
 "
 " grep and replace
 Plug 'nvim-pack/nvim-spectre'
+" Git Diffs
+Plug 'sindrets/diffview.nvim'
+Plug 'akinsho/git-conflict.nvim'
+
 
 call plug#end()
+
 "
 " " vim-sensible does alot of the work
 " " but here's the last 1%
@@ -168,7 +172,6 @@ nmap <leader>o :copen<CR>
 function! FunctionsBetweenLines(start_line, end_line)
     return luaeval('functions_between_lines(_A[1], _A[2])', [a:start_line, a:end_line])
 endfunction
-command! -nargs=2 FunctionsBetweenLines echo FunctionsBetweenLines(<f-args>)
 
 nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 
@@ -190,10 +193,12 @@ nnoremap <leader>fo <cmd>lua require('telescope.builtin').oldfiles()<cr>
 nnoremap <leader>fi <cmd>lua require('telescope.builtin').find_files({cwd="~/.config/nvim/"})<cr>
 " Grep files in your nvim directory
 nnoremap <leader>gi <cmd>lua require('telescope.builtin').live_grep({cwd="~/.config/nvim/"})<cr>
-" 
 nnoremap <leader>fl <cmd>lua require('telescope.builtin').lsp_references()<cr>
 " Live Grep, Fxg but you go straight there
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+
+" Live Grep, only the quickfix list
+nnoremap <leader>gq <cmd>lua require('luaModules').GrepQuickfixFiles()<cr>
 " Grep the string under your cursor
 nnoremap <leader>fs <cmd>lua require('telescope.builtin').grep_string()<cr>
 " Find instance of your current filename, (great for moving up the tree if you're in a view)
@@ -213,10 +218,13 @@ nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 " reload zshrc 
 nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
 " include hidden
-nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({cwd="~",hidden=true})<cr>
+nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({find_command={"rg", "--files", "--hidden", "--max-depth", "1"}, search_dirs={"~"}})<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
 " nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
- nnoremap <leader>bb <cmd>!php-cs-fixer fix % --using-cache=no<cr>
+nnoremap <leader>bb <cmd>!php-cs-fixer fix % --using-cache=no<cr>
+" Prettier
+nnoremap <leader>bp <cmd>!npx prettier % --write<cr>
+" remove file from linter_exclusion files
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
 " run current php file
@@ -226,6 +234,19 @@ nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
 nnoremap Y yg$ 
 
 nnoremap <leader>S <cmd>lua require("spectre").open()<CR>
+
+" For set paste and unset paste
+nnoremap <leader>sp <cmd>set paste<CR>
+" Set normal
+nnoremap <leader>np <cmd>set nopaste<CR>
+
+function! GitDiffToQuickfix()
+    let l:diff_output = systemlist('git diff --name-only master')
+    call setqflist([], ' ', {'lines': l:diff_output, 'efm': '%f'})
+    copen
+endfunction
+
+nnoremap <leader>fq :call GitDiffToQuickfix()<CR>
 
 " Toggle copilot on and off
 " Copilot off by default
@@ -282,7 +303,7 @@ lua <<EOF
   -- setup nvim-treesitter-context
   require'nvim-treesitter.configs'.setup {
       -- A list of parser names, or "all"
-      ensure_installed = {"php","python","c","rust"},
+      ensure_installed = {"php","python","c","rust", 'javascript'},
 
       -- Install parsers synchronously (only applied to `ensure_installed`)
       sync_install = false,
@@ -408,6 +429,8 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  -- See all lsp commands in telesecope
+  buf_set_keymap('n', '<space>tl', '<cmd>Telescope lsp_document_symbols<CR>', opts)
 
   -- Remaps for the refactoring operations currently offered by the plugin
   require('refactoring').setup({})
@@ -442,7 +465,7 @@ end
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp', "tsserver"}
-local servers = {'pyright', "intelephense", 'rust_analyzer'}
+local servers = {'pyright', "intelephense", 'rust_analyzer', "ts_ls"}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -496,6 +519,7 @@ source ~/.config/nvim/php_scratch.vim
 source ~/.config/nvim/datascience.vim
 source ~/.config/nvim/forethought.vim
 source ~/.config/nvim/leasecalcs.vim
+source ~/.config/nvim/lint.vim
 
 " Don't fix the lack of newline at the end of a file 
 " prevents me from changing every file I visit
@@ -504,3 +528,9 @@ set nofixendofline
 set tabstop=4
 set shiftwidth=4
 set expandtab
+set ts=4
+
+" Ensure FileType is set to javascript for files ending in .js
+autocmd BufRead,BufNewFile *.js setlocal filetype=javascript
+" Set tab spacing specific to JavaScript files
+autocmd BufEnter *.js set shiftwidth=4 ts=4 expandtab
