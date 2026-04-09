@@ -53,7 +53,7 @@ nnoremap <Leader>ct :call OpenCorrespondingTestFile()<CR>
 
 
 " Map the function to a key combination, for example, <Leader>cs
-nnoremap <Leader>ss :call CamelToSnake()<CR>
+" nnoremap <Leader>ss :call CamelToSnake()<CR>
 nnoremap <Leader>sc :call SnakeCaseUnderCursor()<CR>
 
 " Run phpunit test and show the result

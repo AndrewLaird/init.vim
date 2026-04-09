@@ -1,7 +1,7 @@
 " Set of tools for daily python_scratch and notetaking
 "
 function Open_page_with_autoimport(filename)
-    let scrapy_directory = "/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/"
+    let scrapy_directory = "/www/sites/alaird.dev-leasecalcs.com/.scraphp/"
     let fullpath = scrapy_directory.a:filename
     if !filereadable(glob(fullpath))
         execute ':silent !cp '.scrapy_directory."start.php ".fullpath
@@ -31,8 +31,8 @@ function Python_open_yesterday()
     call Open_page_with_autoimport(filename)
 endfunction
 
-nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/", no_ignore=true})<cr>
-nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({search_dirs={"/www/sites/alaird.dev-leasecalcs.com/app/.scraphp/"}, additional_args = function(opts) return {"--hidden", "--no-ignore"} end })<cr>
+nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files({cwd="/www/sites/alaird.dev-leasecalcs.com/.scraphp/", no_ignore=true})<cr>
+nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep({search_dirs={"/www/sites/alaird.dev-leasecalcs.com/.scraphp/"}, additional_args = function(opts) return {"--hidden", "--no-ignore"} end })<cr>
 nnoremap <leader>tt <cmd>call Python_open_today()<cr>
 nnoremap <leader>t1 <cmd>call Python_open_today_page(1)<cr>
 nnoremap <leader>t2 <cmd>call Python_open_today_page(2)<cr>

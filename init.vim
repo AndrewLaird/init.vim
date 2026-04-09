@@ -98,8 +98,6 @@ Plug 'ekalinin/Dockerfile.vim'
 "
 " Codeum code compleition
 " Plug 'Exafunction/codeium.vim'
-" Code completion :Copilot setup
-Plug 'github/copilot.vim'
 
 " Async linter, used for mypy , appears to be slow
 " Plug 'scrooloose/syntastic'
@@ -110,7 +108,8 @@ Plug 'nvim-pack/nvim-spectre'
 " Git Diffs
 Plug 'sindrets/diffview.nvim'
 Plug 'akinsho/git-conflict.nvim'
-
+" Phpstan static analysis
+Plug 'phpstan/vim-phpstan'
 
 " Using llms locally in neovim
 Plug 'David-Kunz/gen.nvim'
@@ -181,6 +180,8 @@ nnoremap <leader>tc :lua require('luaModules').ToggleCopilot()<CR>
 "nnoremap <leader>g <cmd>Telescope live_grep<cr>
 "nnoremap <leader>fb <cmd>Telescope buffers<cr>
 "nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+" Live Grep, only the quickfix list
+nnoremap <leader>qq <cmd>lua require('luaModules').Reformat_parenthesized_content()<cr>
 
 " Find files in current directory
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
@@ -220,14 +221,17 @@ nnoremap <leader>fz <cmd>e ~/.zshrc<cr>
 nnoremap <leader>fhz <cmd>lua require('telescope.builtin').find_files({find_command={"rg", "--files", "--hidden", "--max-depth", "1"}, search_dirs={"~"}})<cr>
 nnoremap <leader>rz <cmd>!source ~/.zshrc<cr>
 " nnoremap <leader>bb <cmd>!python3 -m black %<cr><cmd>!python3 -m autoflake --in-place %<cr>
-nnoremap <leader>bb <cmd>!php-cs-fixer fix % --using-cache=no<cr>
+nnoremap <leader>bb <cmd>!php-cs-fixer fix "%" --using-cache=no<cr>
 " Prettier
 nnoremap <leader>bp <cmd>!npx prettier % --write<cr>
 " remove file from linter_exclusion files
 " run current php file
  nnoremap <leader>pp <cmd>!php %<cr>
+ nnoremap <leader>rp :let fname = expand('%') \| vnew \| execute 'r !php ' . fname<CR>
  nnoremap <leader>py <cmd>!python3 %<cr>
  nnoremap <leader>rr <cmd>!cargo run<cr>
+" nnoremap <leader>ss <cmd>!make phpstan ARGS="%"<cr>
+" nnoremap <leader>ss :vnew | read !make phpstan ARGS="%"
 " run current php file
  nnoremap <leader>ts <cmd>set ts=4<cr>
 
@@ -301,6 +305,49 @@ tnoremap <leader><ESC> <C-\><C-n>
 " nvim-cmp
 lua <<EOF
 
+
+    vim.keymap.set('n', '<leader>ss', function()
+      -- Save current window to return to
+      local left_win = vim.api.nvim_get_current_win()
+      local file = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(left_win)) -- get filename from left buffer
+
+      -- Open vertical split and get new buffer
+      vim.cmd('vnew')
+      local buf = vim.api.nvim_get_current_buf()
+
+      -- Set buffer options
+      vim.bo[buf].buftype = 'nofile'
+      vim.bo[buf].bufhidden = 'wipe'
+      vim.bo[buf].swapfile = false
+      vim.bo[buf].modifiable = true
+
+      -- Start the job
+      vim.fn.jobstart({ 'make', 'phpstan', 'ARGS=' .. file }, {
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+          if data then
+            vim.schedule(function()
+              vim.api.nvim_buf_set_lines(buf, -1, -1, false, data)
+            end)
+          end
+        end,
+        on_stderr = function(_, data)
+          if data then
+            vim.schedule(function()
+              vim.api.nvim_buf_set_lines(buf, -1, -1, false, data)
+            end)
+          end
+        end,
+        on_exit = function()
+          vim.schedule(function()
+            vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "-- Process exited --" })
+          end)
+        end,
+      })
+
+      -- Go back to the original window
+      vim.api.nvim_set_current_win(left_win)
+    end, { desc = "Run make phpstan and show output in right split" })
 
   -- setup nvim-treesitter-context
   require'nvim-treesitter.configs'.setup {
@@ -464,15 +511,13 @@ local on_attach = function(client, bufnr)
       "<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
       { noremap = true }
   )
-
-
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- pyright is too good, the type checking shows problems in our type defenitions
 -- local servers = {'pylsp', "tsserver"}
-local servers = {'pyright', "intelephense", 'rust_analyzer', "ts_ls"}
+local servers = {'pyright', "intelephense", 'rust_analyzer', "ts_ls", "groovyls"}
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
@@ -482,7 +527,19 @@ for _, lsp in ipairs(servers) do
   }
 end
 
-
+nvim_lsp.twiggy_language_server.setup {
+    on_attach = on_attach,
+    settings = {
+        twiggy = {
+            framework = 'twig',
+            phpExecutable = '/usr/bin/php',
+            vanillaTwigEnvironmentPath = './bin/twig_environment.php',
+            diagnostics = {
+                twigCsFixer = false,
+            },
+        },
+    },
+}
 
 EOF
 

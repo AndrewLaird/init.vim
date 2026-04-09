@@ -4,7 +4,7 @@ function! AddCurrentFileToExclusionList()
     let current_file = expand('%')
 
     " Ensure the path is relative to /app
-    let app_relative_file = substitute(current_file, '^.*\/app\/', 'app/', '')
+    let app_relative_file = current_file
 
     " Read the exclusion list into a list
     let lines = readfile(exclusion_file)
