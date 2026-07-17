@@ -212,7 +212,7 @@ nnoremap <leader>fa <cmd>lua require('telescope.builtin').help_tags()<cr>
 " you're going 
 nnoremap <leader>fj <cmd>lua require('telescope.builtin').marks()<cr>
 " goto the references of what is under your cursor
-nnoremap gr <cmd>lua require('telescope.builtin').lsp_references()<cr>
+nnoremap gr <cmd>lua require('telescope.builtin').lsp_references({file_ignore_patterns = { "%.claude/" }})<cr>
 " reload init.vim
 nnoremap <leader>rl <cmd>source ~/.config/nvim/init.vim<cr>
 " reload zshrc 
